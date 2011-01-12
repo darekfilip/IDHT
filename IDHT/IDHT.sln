@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDHT-Common", "IDHT-Common\IDHT-Common.csproj", "{3EAF9F7A-78A8-49CA-A154-59304791F344}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3EAF9F7A-78A8-49CA-A154-59304791F344}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EAF9F7A-78A8-49CA-A154-59304791F344}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EAF9F7A-78A8-49CA-A154-59304791F344}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EAF9F7A-78A8-49CA-A154-59304791F344}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = IDHT-Common\IDHT-Common.csproj
+	EndGlobalSection
+EndGlobal

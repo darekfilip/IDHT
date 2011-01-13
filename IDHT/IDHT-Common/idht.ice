@@ -25,7 +25,7 @@ module IDHT {
 		string seatchDHT(string key);
 
 		// wklada badz przekazuje sprawe do swoich sasiadow
-		void insertDHT(string key, int val);
+		void insertDHT(string key, string val);
 
 		// dodaje pare klucz->wartosc do drzewa
 		void insertDHT(string key, string val);

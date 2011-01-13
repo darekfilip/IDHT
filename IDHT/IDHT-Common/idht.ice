@@ -22,13 +22,13 @@ module IDHT {
 		void disconnected(string id, string connectTo);
 
 		// przeszukuje - sprawdza u siebie i ewentualnie sasiadow
-		string seatchDHT(int key);
+		string seatchDHT(string key);
 
 		// wklada badz przekazuje sprawe do swoich sasiadow
-		void insertDHT(int key, int val);
+		void insertDHT(string key, int val);
 
 		// dodaje pare klucz->wartosc do drzewa
-		int insertDHT(string val);
+		void insertDHT(string key, string val);
 	};
 
 	interface DHTMaster {

@@ -35,10 +35,15 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\usr\lib\cli\libzeroc-ice3.3\Ice.dll</HintPath>
     </Reference>
+    <Reference Include="IceBox, Version=3.3.1.0, Culture=neutral, PublicKeyToken=1f998c50fec78381">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\usr\lib\cli\libzeroc-ice3.3\IceBox.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="DHTNodeI.cs" />
+    <Compile Include="Server.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IDHT-Common\IDHT-Common.csproj">

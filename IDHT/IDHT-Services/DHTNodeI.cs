@@ -2,6 +2,8 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 
+using Ice;
+
 using IDHT;
 using IDHTCommon;
 
@@ -10,6 +12,8 @@ namespace IDHTServices
 	public class DHTNodeI : DHTNodeDisp_
 	{	
 		private range subtreeRange;
+		
+		private Communicator _communicator;
 		
 		private List<range> ranges = new List<range>();
 		
@@ -279,13 +283,37 @@ namespace IDHTServices
 			}
 		}
 		
-		public DHTNodeI (range my_range, string parent, string nodeName)
+		public void shutDown()
 		{
-			subtreeRange = my_range;
-			_nodeName = nodeName;
-			_parent = parent;
-			ranges.Add(my_range);	
+			
+		}
+		
+		private DHTNodePrx getParentNode()
+		{
+			
+		}
+		
+		public DHTNodeI (string nodeName, bool isMaster, Communicator communicator)
+		{
+			bool configured = false;
 			IsDisconnecting = false;
+			
+			if (isMaster)
+			{
+				// TODO: sprawdzic czy sa jakies wezly jak tak to podlaczyc
+				// a nie tworzyc nowe
+				subtreeRange = new range(int.MinValue, int.MaxValue);
+				_nodeName = nodeName;
+				_parent = null;
+				ranges.Add(subtreeRange);
+				
+				configured = true;
+			}
+			
+			if (!configured) 
+			{
+				// TODO: polaczyc sie z losowym wezlem w grupie replikacji i pobrac konfiguracje
+			}
 		}
 	}
 }

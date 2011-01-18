@@ -27,6 +27,16 @@ namespace IDHTServices
 		
 		Boolean IsDisconnecting { get; set; }
 		
+		private object _discLock = new object();
+		
+		private int servNum = 0;
+		
+		private DHTNodePrx getNodeProxy(string id)
+		{
+			ObjectPrx prx = communicator.stringToProxy(Constants.SERVICE_NAME + '@' + id);
+			return DHTNodePrxHelper.checkedCast(prx); 
+		}
+		
 		// redukuje ranges
 		// tzn z 2 A-B oraz B-C robi A-C itp..
 		private void reduceRanges()
@@ -64,11 +74,15 @@ namespace IDHTServices
 			ranges = newRanges;
 		}
 		
-		public override void masterDisconnected (string id, string connectTo, range[] newRanges, nodeConf[] childRanges, Ice.Current current__)
+		public override void masterDisconnected (string connectTo, range subtree, range[] newRanges, nodeConf[] childRanges, Ice.Current current__)
 		{
 			lock (ranges)
 			{
 				_parent = connectTo;
+				if (connectTo == null) // jestem nowy rootem dla tego poddrzewa
+				{
+					subtreeRange = subtree;
+				}
 				ranges.AddRange(newRanges);
 				foreach (nodeConf nc in childRanges)
 				{
@@ -85,6 +99,7 @@ namespace IDHTServices
 			{
 				throw new Exception("Node shutting down.");
 			}
+
 			lock (ranges)
 			{
 				nodeConf nc = new nodeConf();
@@ -122,7 +137,7 @@ namespace IDHTServices
 		}
 		
 		
-		public override void slaveDisconnected (string id, Ice.Current current__)
+		public override void slaveDisconnected (string id, range[] newRanges, nodeConf[] childRanges, Ice.Current current__)
 		{
 			lock (ranges)
 			{
@@ -136,9 +151,15 @@ namespace IDHTServices
 				}
 				if (removedNode != null)
 				{
-					ranges.Add(new range(removedNode.min, removedNode.max));
-					childs.Remove(removedNode);
+					foreach (range r in newRanges)
+					{
+						ranges.Add(r);
+					}
 					reduceRanges();
+					foreach (nodeConf nc in childRanges)
+					{
+						childs.Add(nc);
+					}
 				}
 				else 
 				{
@@ -147,12 +168,34 @@ namespace IDHTServices
 			}
 		}		
 		
-		public override string seatchDHT (string key, Ice.Current current__)
+		private void enter()
 		{
-			if (IsDisconnecting)
+			lock (_discLock)
 			{
-				throw new Exception("Node shutting down");
+				if (IsDisconnecting)
+				{
+					throw new Exception("Node shutting down");
+				}
+				++servNum;
 			}
+		}
+		
+		private void leave()
+		{
+			lock (_discLock)
+			{
+				--servNum;
+				if (servNum == 0) 
+				{
+					Monitor.Pulse(_discLock);
+				}
+			}
+		}
+		
+		public override string searchDHT (string key, Ice.Current current__)
+		{
+			enter();
+			
 			int crc = CRC.getCRC(key);
 			if (crc <= subtreeRange.max && crc >= subtreeRange.min)
 			{
@@ -171,11 +214,13 @@ namespace IDHTServices
 								{
 									if (kvp.key == key)
 									{
+										leave();
 										return kvp.value;
 									}
 								}
 							}
 						}
+						leave();
 						return null;
 					}
 				}
@@ -192,8 +237,15 @@ namespace IDHTServices
 						{
 							if (nc.min <= crc && nc.max >= crc)
 							{
-								// TODO
-								return null;
+								DHTNodePrx prx = getNodeProxy(nc.nodeId);
+								if (prx == null)
+								{
+									// jesli jest w dzieciach a nie osiagalna 
+									// to sie wyrejestrowuje
+									throw new Exception("Node not present!");
+								}
+								leave();
+								return prx.searchDHT(key);
 							}
 						}
 					}
@@ -203,6 +255,7 @@ namespace IDHTServices
 						Thread.Sleep(100);
 					}
 				}
+				leave();
 				return null;
 			}
 			else
@@ -213,8 +266,13 @@ namespace IDHTServices
 					error = false;
 					try
 					{
-						// TODO: odpytanie rodzica
-						return null;
+						DHTNodePrx prx = getNodeProxy(_parent);
+						if (prx == null)
+						{
+							throw new Exception("Parent not present");
+						}
+						leave();
+						return prx.searchDHT(key);
 					}
 					catch (Exception)
 					{
@@ -223,21 +281,20 @@ namespace IDHTServices
 					}
 				}
 			}
+			leave();
 			return null;
 		}
 		
 		
 		public override void insertDHT (string key, string val, Ice.Current current__)
 		{
-			if (IsDisconnecting)
-			{
-				throw new Exception("Node shutting down.");
-			}
+			enter();
 			int crc = CRC.getCRC(key);
 			if (crc <= subtreeRange.max && crc >= subtreeRange.min) 
 			{
 				// wyszukujemy wśród dzieci
 				bool error = true;
+				bool inserted = false;
 				while (error)
 				{
 					error = false;
@@ -252,7 +309,14 @@ namespace IDHTServices
 						{
 							if (n.min <= crc && n.max >= crc)
 							{
-								// TODO: sprobowac odebrac wartosc
+								DHTNodePrx prx = getNodeProxy(n.nodeId);
+								if (prx == null)
+								{
+									throw new Exception("Node not present");
+								}
+								prx.insertDHT(key, val);
+								inserted = true;
+								break;
 							}
 						}
 					}
@@ -260,7 +324,23 @@ namespace IDHTServices
 					{
 						// wystapil blad - czekamy i ponawiamy
 						error = true;
+						inserted = false;
 						Thread.Sleep(100);
+					}
+				}
+				if (!inserted)
+				{
+					lock (values)
+					{
+						if (values.ContainsKey(crc))
+						{
+							values[crc].Add(new keyvaluepair(key, val));
+						}
+						else
+						{
+							values[crc] = new List<keyvaluepair>();
+							values[crc].Add(new keyvaluepair(key, val));
+						}
 					}
 				}
 			}
@@ -272,7 +352,8 @@ namespace IDHTServices
 					error = false;
 					try
 					{
-						//TODO: odpytanie rodzica
+						DHTNodePrx parent = getNodeProxy(_parent);
+						parent.insertDHT(key, val);
 					}
 					catch (Exception)
 					{
@@ -281,40 +362,90 @@ namespace IDHTServices
 					}
 				}
 			}
+			leave();
 		}
 		
 		public void shutDown()
 		{
-			
-		}
-		
-		private DHTNodePrx getParentNode()
-		{
-			
+			IsDisconnecting = true;
+			lock (_discLock)
+			{
+				while (servNum > 0) 
+				{
+					Monitor.Wait(_discLock);
+				}
+			}
+			if (_parent == null) // jestem rootem - wyznaczam jednego z moich potomkow na roota
+			{
+				string newRoot = null;
+				foreach (nodeConf ch in childs)
+				{
+					DHTNodePrx child = getNodeProxy(ch.nodeId);
+					if (newRoot == null)
+					{
+						child.masterDisconnected(newRoot, subtreeRange, ranges.ToArray(), childs.ToArray()); 
+						newRoot = ch.nodeId;
+					} 
+					else 
+					{
+						child.masterDisconnected(newRoot, null, new range[0], new nodeConf[0]);
+					}
+				}
+			}
+			else // nie jestem rootem - podlaczam moich potomkow do roota
+			{
+				foreach (nodeConf ch in childs)
+				{
+					DHTNodePrx child = getNodeProxy(ch.nodeId);
+					child.masterDisconnected(_parent, null, new range[0], new nodeConf[0]);
+				}
+				DHTNodePrx prx = getNodeProxy(_parent);
+				prx.slaveDisconnected(_nodeName, ranges.ToArray(), childs.ToArray());
+			}
 		}
 		
 		public DHTNodeI (string nodeName, bool isMaster, Communicator communicator)
 		{
 			bool configured = false;
 			IsDisconnecting = false;
-			
-			if (isMaster)
+			_communicator = communicator;
+			_nodeName = nodeName;
+		
+			while (!configured)
 			{
-				// TODO: sprawdzic czy sa jakies wezly jak tak to podlaczyc
-				// a nie tworzyc nowe
-				subtreeRange = new range(int.MinValue, int.MaxValue);
-				_nodeName = nodeName;
-				_parent = null;
-				ranges.Add(subtreeRange);
-				
-				configured = true;
-			}
-			
-			if (!configured) 
-			{
-				// TODO: polaczyc sie z losowym wezlem w grupie replikacji i pobrac konfiguracje
+				if (isMaster)
+				{
+					ObjectPrx prx = communicator.stringToProxy(Constants.SERVICE_NAME + '@' + id);
+					if (DHTNodePrxHelper.checkedCast(prx) == null)
+					{
+						subtreeRange = new range(int.MinValue, int.MaxValue);
+						_parent = null;
+						ranges.Add(subtreeRange);
+						break;
+					}
+				}
+		
+				ObjectPrx prx = communicator.stringToProxy(Constants.SERVICE_NAME);
+				DHTNodePrx nprx =  DHTNodePrxHelper.checkedCast(prx);
+				if (nprx != null)
+				{
+					try 
+					{
+						nodeConf my_node = nprx.newConnected(nodeName);
+						subtreeRange range = new range(my_node.min,my_node.max);
+						_parent = my_node.parentNode;
+						configured = true;
+					}
+					catch (Exception)
+					{
+						configured = false;
+					}
+				}
+				else
+				{
+					Thread.Sleep(500);	
+				}
 			}
 		}
 	}
 }
-

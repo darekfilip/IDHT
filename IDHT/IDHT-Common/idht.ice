@@ -33,14 +33,14 @@ module IDHT {
 		nodeConf newConnected(string id);
 
 		// wezel znika i zglasza to do swojego rodzica
-		void slaveDisconnected(string id);
+		void slaveDisconnected(string id, ranges newRanges, confs childRanges);
 
 		// wezel zglasza do swoich potomkow
 		// i kaze im sie polaczyc do swojego mastera
-		void masterDisconnected(string id, string connectTo, ranges newRanges, confs childRanges);
+		void masterDisconnected(string connectTo, range subtree, ranges newRanges, confs childRanges);
 
 		// przeszukuje - sprawdza u siebie i ewentualnie sasiadow
-		string seatchDHT(string key);
+		string searchDHT(string key);
 
 		// wklada badz przekazuje sprawe do swoich sasiadow
 		void insertDHT(string key, string val);

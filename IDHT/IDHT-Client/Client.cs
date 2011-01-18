@@ -22,7 +22,7 @@ namespace IDHTClient
 				throw new ApplicationException("Wrong proxy");
 			}
 			dhtnode.insertDHT("darek", "value for darek");
-			Console.WriteLine(dhtnode.seatchDHT("darek"));
+			Console.WriteLine(dhtnode.searchDHT("darek"));
 			return 0;
 		}
 	}

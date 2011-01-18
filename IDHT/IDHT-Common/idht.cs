@@ -437,14 +437,14 @@ namespace IDHT
         IDHT.nodeConf newConnected(string id);
         IDHT.nodeConf newConnected(string id, _System.Collections.Generic.Dictionary<string, string> context__);
 
-        void slaveDisconnected(string id);
-        void slaveDisconnected(string id, _System.Collections.Generic.Dictionary<string, string> context__);
+        void slaveDisconnected(string id, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges);
+        void slaveDisconnected(string id, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__);
 
-        void masterDisconnected(string id, string connectTo, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges);
-        void masterDisconnected(string id, string connectTo, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__);
+        void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges);
+        void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__);
 
-        string seatchDHT(string key);
-        string seatchDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__);
+        string searchDHT(string key);
+        string searchDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__);
 
         void insertDHT(string key, string val);
         void insertDHT(string key, string val, _System.Collections.Generic.Dictionary<string, string> context__);
@@ -457,11 +457,11 @@ namespace IDHT
     {
         IDHT.nodeConf newConnected(string id, Ice.Current current__);
 
-        void slaveDisconnected(string id, Ice.Current current__);
+        void slaveDisconnected(string id, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, Ice.Current current__);
 
-        void masterDisconnected(string id, string connectTo, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, Ice.Current current__);
+        void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, Ice.Current current__);
 
-        string seatchDHT(string key, Ice.Current current__);
+        string searchDHT(string key, Ice.Current current__);
 
         void insertDHT(string key, string val, Ice.Current current__);
     }
@@ -470,11 +470,11 @@ namespace IDHT
     {
         IDHT.nodeConf newConnected(string id);
 
-        void slaveDisconnected(string id);
+        void slaveDisconnected(string id, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges);
 
-        void masterDisconnected(string id, string connectTo, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges);
+        void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges);
 
-        string seatchDHT(string key);
+        string searchDHT(string key);
 
         void insertDHT(string key, string val);
     }
@@ -634,17 +634,17 @@ namespace IDHT
             }
         }
 
-        public void masterDisconnected(string id, string connectTo, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges)
+        public void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges)
         {
-            masterDisconnected(id, connectTo, newRanges, childRanges, null, false);
+            masterDisconnected(connectTo, subtree, newRanges, childRanges, null, false);
         }
 
-        public void masterDisconnected(string id, string connectTo, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__)
+        public void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__)
         {
-            masterDisconnected(id, connectTo, newRanges, childRanges, context__, true);
+            masterDisconnected(connectTo, subtree, newRanges, childRanges, context__, true);
         }
 
-        private void masterDisconnected(string id, string connectTo, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__, bool explicitContext__)
+        private void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__, bool explicitContext__)
         {
             if(explicitContext__ && context__ == null)
             {
@@ -658,7 +658,7 @@ namespace IDHT
                 {
                     delBase__ = getDelegate__(false);
                     DHTNodeDel_ del__ = (DHTNodeDel_)delBase__;
-                    del__.masterDisconnected(id, connectTo, newRanges, childRanges, context__);
+                    del__.masterDisconnected(connectTo, subtree, newRanges, childRanges, context__);
                     return;
                 }
                 catch(IceInternal.LocalExceptionWrapper ex__)
@@ -710,17 +710,17 @@ namespace IDHT
             }
         }
 
-        public string seatchDHT(string key)
+        public string searchDHT(string key)
         {
-            return seatchDHT(key, null, false);
+            return searchDHT(key, null, false);
         }
 
-        public string seatchDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__)
+        public string searchDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__)
         {
-            return seatchDHT(key, context__, true);
+            return searchDHT(key, context__, true);
         }
 
-        private string seatchDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__, bool explicitContext__)
+        private string searchDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__, bool explicitContext__)
         {
             if(explicitContext__ && context__ == null)
             {
@@ -732,10 +732,10 @@ namespace IDHT
                 Ice.ObjectDel_ delBase__ = null;
                 try
                 {
-                    checkTwowayOnly__("seatchDHT");
+                    checkTwowayOnly__("searchDHT");
                     delBase__ = getDelegate__(false);
                     DHTNodeDel_ del__ = (DHTNodeDel_)delBase__;
-                    return del__.seatchDHT(key, context__);
+                    return del__.searchDHT(key, context__);
                 }
                 catch(IceInternal.LocalExceptionWrapper ex__)
                 {
@@ -748,17 +748,17 @@ namespace IDHT
             }
         }
 
-        public void slaveDisconnected(string id)
+        public void slaveDisconnected(string id, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges)
         {
-            slaveDisconnected(id, null, false);
+            slaveDisconnected(id, newRanges, childRanges, null, false);
         }
 
-        public void slaveDisconnected(string id, _System.Collections.Generic.Dictionary<string, string> context__)
+        public void slaveDisconnected(string id, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__)
         {
-            slaveDisconnected(id, context__, true);
+            slaveDisconnected(id, newRanges, childRanges, context__, true);
         }
 
-        private void slaveDisconnected(string id, _System.Collections.Generic.Dictionary<string, string> context__, bool explicitContext__)
+        private void slaveDisconnected(string id, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__, bool explicitContext__)
         {
             if(explicitContext__ && context__ == null)
             {
@@ -772,7 +772,7 @@ namespace IDHT
                 {
                     delBase__ = getDelegate__(false);
                     DHTNodeDel_ del__ = (DHTNodeDel_)delBase__;
-                    del__.slaveDisconnected(id, context__);
+                    del__.slaveDisconnected(id, newRanges, childRanges, context__);
                     return;
                 }
                 catch(IceInternal.LocalExceptionWrapper ex__)
@@ -935,11 +935,11 @@ namespace IDHT
     {
         IDHT.nodeConf newConnected(string id, _System.Collections.Generic.Dictionary<string, string> context__);
 
-        void slaveDisconnected(string id, _System.Collections.Generic.Dictionary<string, string> context__);
+        void slaveDisconnected(string id, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__);
 
-        void masterDisconnected(string id, string connectTo, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__);
+        void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__);
 
-        string seatchDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__);
+        string searchDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__);
 
         void insertDHT(string key, string val, _System.Collections.Generic.Dictionary<string, string> context__);
     }
@@ -994,7 +994,7 @@ namespace IDHT
             }
         }
 
-        public void masterDisconnected(string id, string connectTo, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__)
+        public void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__)
         {
             IceInternal.Outgoing og__ = handler__.getOutgoing("masterDisconnected", Ice.OperationMode.Normal, context__);
             try
@@ -1002,8 +1002,8 @@ namespace IDHT
                 try
                 {
                     IceInternal.BasicStream os__ = og__.ostr();
-                    os__.writeString(id);
                     os__.writeString(connectTo);
+                    subtree.write__(os__);
                     if(newRanges == null)
                     {
                         os__.writeSize(0);
@@ -1114,9 +1114,9 @@ namespace IDHT
             }
         }
 
-        public string seatchDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__)
+        public string searchDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__)
         {
-            IceInternal.Outgoing og__ = handler__.getOutgoing("seatchDHT", Ice.OperationMode.Normal, context__);
+            IceInternal.Outgoing og__ = handler__.getOutgoing("searchDHT", Ice.OperationMode.Normal, context__);
             try
             {
                 try
@@ -1160,7 +1160,7 @@ namespace IDHT
             }
         }
 
-        public void slaveDisconnected(string id, _System.Collections.Generic.Dictionary<string, string> context__)
+        public void slaveDisconnected(string id, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__)
         {
             IceInternal.Outgoing og__ = handler__.getOutgoing("slaveDisconnected", Ice.OperationMode.Normal, context__);
             try
@@ -1169,6 +1169,30 @@ namespace IDHT
                 {
                     IceInternal.BasicStream os__ = og__.ostr();
                     os__.writeString(id);
+                    if(newRanges == null)
+                    {
+                        os__.writeSize(0);
+                    }
+                    else
+                    {
+                        os__.writeSize(newRanges.Length);
+                        for(int ix__ = 0; ix__ < newRanges.Length; ++ix__)
+                        {
+                            newRanges[ix__].write__(os__);
+                        }
+                    }
+                    if(childRanges == null)
+                    {
+                        os__.writeSize(0);
+                    }
+                    else
+                    {
+                        os__.writeSize(childRanges.Length);
+                        for(int ix__ = 0; ix__ < childRanges.Length; ++ix__)
+                        {
+                            (childRanges[ix__] == null ? new IDHT.nodeConf() : childRanges[ix__]).write__(os__);
+                        }
+                    }
                 }
                 catch(Ice.LocalException ex__)
                 {
@@ -1252,7 +1276,7 @@ namespace IDHT
             }
         }
 
-        public void masterDisconnected(string id, string connectTo, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__)
+        public void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__)
         {
             Ice.Current current__ = new Ice.Current();
             initCurrent__(ref current__, "masterDisconnected", Ice.OperationMode.Normal, context__);
@@ -1267,7 +1291,7 @@ namespace IDHT
                 {
                     throw new Ice.OperationNotExistException(current__.id, current__.facet, current__.operation);
                 }
-                servant__.masterDisconnected(id, connectTo, newRanges, childRanges, current__);
+                servant__.masterDisconnected(connectTo, subtree, newRanges, childRanges, current__);
                 return Ice.DispatchStatus.DispatchOK;
             };
             IceInternal.Direct direct__ = null;
@@ -1338,10 +1362,10 @@ namespace IDHT
             return result__;
         }
 
-        public string seatchDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__)
+        public string searchDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__)
         {
             Ice.Current current__ = new Ice.Current();
-            initCurrent__(ref current__, "seatchDHT", Ice.OperationMode.Normal, context__);
+            initCurrent__(ref current__, "searchDHT", Ice.OperationMode.Normal, context__);
             string result__ = null;
             IceInternal.Direct.RunDelegate run__ = delegate(Ice.Object obj__)
             {
@@ -1354,7 +1378,7 @@ namespace IDHT
                 {
                     throw new Ice.OperationNotExistException(current__.id, current__.facet, current__.operation);
                 }
-                result__ = servant__.seatchDHT(key, current__);
+                result__ = servant__.searchDHT(key, current__);
                 return Ice.DispatchStatus.DispatchOK;
             };
             IceInternal.Direct direct__ = null;
@@ -1382,7 +1406,7 @@ namespace IDHT
             return result__;
         }
 
-        public void slaveDisconnected(string id, _System.Collections.Generic.Dictionary<string, string> context__)
+        public void slaveDisconnected(string id, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__)
         {
             Ice.Current current__ = new Ice.Current();
             initCurrent__(ref current__, "slaveDisconnected", Ice.OperationMode.Normal, context__);
@@ -1397,7 +1421,7 @@ namespace IDHT
                 {
                     throw new Ice.OperationNotExistException(current__.id, current__.facet, current__.operation);
                 }
-                servant__.slaveDisconnected(id, current__);
+                servant__.slaveDisconnected(id, newRanges, childRanges, current__);
                 return Ice.DispatchStatus.DispatchOK;
             };
             IceInternal.Direct direct__ = null;
@@ -1439,26 +1463,26 @@ namespace IDHT
 
         public abstract IDHT.nodeConf newConnected(string id, Ice.Current current__);
 
-        public void slaveDisconnected(string id)
+        public void slaveDisconnected(string id, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges)
         {
-            slaveDisconnected(id, Ice.ObjectImpl.defaultCurrent);
+            slaveDisconnected(id, newRanges, childRanges, Ice.ObjectImpl.defaultCurrent);
         }
 
-        public abstract void slaveDisconnected(string id, Ice.Current current__);
+        public abstract void slaveDisconnected(string id, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, Ice.Current current__);
 
-        public void masterDisconnected(string id, string connectTo, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges)
+        public void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges)
         {
-            masterDisconnected(id, connectTo, newRanges, childRanges, Ice.ObjectImpl.defaultCurrent);
+            masterDisconnected(connectTo, subtree, newRanges, childRanges, Ice.ObjectImpl.defaultCurrent);
         }
 
-        public abstract void masterDisconnected(string id, string connectTo, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, Ice.Current current__);
+        public abstract void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, Ice.Current current__);
 
-        public string seatchDHT(string key)
+        public string searchDHT(string key)
         {
-            return seatchDHT(key, Ice.ObjectImpl.defaultCurrent);
+            return searchDHT(key, Ice.ObjectImpl.defaultCurrent);
         }
 
-        public abstract string seatchDHT(string key, Ice.Current current__);
+        public abstract string searchDHT(string key, Ice.Current current__);
 
         public void insertDHT(string key, string val)
         {
@@ -1545,20 +1569,6 @@ namespace IDHT
             is__.startReadEncaps();
             string id;
             id = is__.readString();
-            is__.endReadEncaps();
-            obj__.slaveDisconnected(id, current__);
-            return Ice.DispatchStatus.DispatchOK;
-        }
-
-        public static Ice.DispatchStatus masterDisconnected___(DHTNode obj__, IceInternal.Incoming inS__, Ice.Current current__)
-        {
-            checkMode__(Ice.OperationMode.Normal, current__.mode);
-            IceInternal.BasicStream is__ = inS__.istr();
-            is__.startReadEncaps();
-            string id;
-            id = is__.readString();
-            string connectTo;
-            connectTo = is__.readString();
             IDHT.range[] newRanges;
             {
                 int szx__ = is__.readSize();
@@ -1584,11 +1594,50 @@ namespace IDHT
                 is__.endSeq(szx__);
             }
             is__.endReadEncaps();
-            obj__.masterDisconnected(id, connectTo, newRanges, childRanges, current__);
+            obj__.slaveDisconnected(id, newRanges, childRanges, current__);
             return Ice.DispatchStatus.DispatchOK;
         }
 
-        public static Ice.DispatchStatus seatchDHT___(DHTNode obj__, IceInternal.Incoming inS__, Ice.Current current__)
+        public static Ice.DispatchStatus masterDisconnected___(DHTNode obj__, IceInternal.Incoming inS__, Ice.Current current__)
+        {
+            checkMode__(Ice.OperationMode.Normal, current__.mode);
+            IceInternal.BasicStream is__ = inS__.istr();
+            is__.startReadEncaps();
+            string connectTo;
+            connectTo = is__.readString();
+            IDHT.range subtree;
+            subtree = new IDHT.range();
+            subtree.read__(is__);
+            IDHT.range[] newRanges;
+            {
+                int szx__ = is__.readSize();
+                is__.checkFixedSeq(szx__, 8);
+                newRanges = new IDHT.range[szx__];
+                for(int ix__ = 0; ix__ < szx__; ++ix__)
+                {
+                    newRanges[ix__].read__(is__);
+                }
+            }
+            IDHT.nodeConf[] childRanges;
+            {
+                int szx__ = is__.readSize();
+                is__.startSeq(szx__, 11);
+                childRanges = new IDHT.nodeConf[szx__];
+                for(int ix__ = 0; ix__ < szx__; ++ix__)
+                {
+                    childRanges[ix__] = new IDHT.nodeConf();
+                    childRanges[ix__].read__(is__);
+                    is__.checkSeq();
+                    is__.endElement();
+                }
+                is__.endSeq(szx__);
+            }
+            is__.endReadEncaps();
+            obj__.masterDisconnected(connectTo, subtree, newRanges, childRanges, current__);
+            return Ice.DispatchStatus.DispatchOK;
+        }
+
+        public static Ice.DispatchStatus searchDHT___(DHTNode obj__, IceInternal.Incoming inS__, Ice.Current current__)
         {
             checkMode__(Ice.OperationMode.Normal, current__.mode);
             IceInternal.BasicStream is__ = inS__.istr();
@@ -1597,7 +1646,7 @@ namespace IDHT
             key = is__.readString();
             is__.endReadEncaps();
             IceInternal.BasicStream os__ = inS__.ostr();
-            string ret__ = obj__.seatchDHT(key, current__);
+            string ret__ = obj__.searchDHT(key, current__);
             os__.writeString(ret__);
             return Ice.DispatchStatus.DispatchOK;
         }
@@ -1625,7 +1674,7 @@ namespace IDHT
             "insertDHT",
             "masterDisconnected",
             "newConnected",
-            "seatchDHT",
+            "searchDHT",
             "slaveDisconnected"
         };
 
@@ -1669,7 +1718,7 @@ namespace IDHT
                 }
                 case 7:
                 {
-                    return seatchDHT___(this, inS__, current__);
+                    return searchDHT___(this, inS__, current__);
                 }
                 case 8:
                 {

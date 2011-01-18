@@ -3,6 +3,8 @@ using System;
 using Ice;
 using IceBox;
 
+using IDHTCommon;
+
 namespace IDHTServices
 {
 	public class Server : Service
@@ -14,11 +16,11 @@ namespace IDHTServices
 		public void start(string name, Communicator communicator, string[] args)
 		{
 			bool isMasterNode = communicator.getProperties().getPropertyAsIntWithDefault("IDHT.Master",0) == 1;
-			string identity = "IDHTNode-"+name;
+			string identity = Constants.SERVICE_NAME + "-" + name;
 			
 			_node = new DHTNodeI(identity, isMasterNode);
 			_adapter = communicator.createObjectAdapter(name);
-			_adapter.add(_node, Ice.Util.stringToIdentity("IDHTNode"));
+			_adapter.add(_node, Ice.Util.stringToIdentity(Constants.SERVICE_NAME));
 			_adapter.add(_node, Ice.Util.stringToIdentity(identity));
 			_adapter.activate();
 		}

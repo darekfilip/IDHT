@@ -42,6 +42,7 @@
     <Compile Include="idht.cs" />
     <Compile Include="CRC.cs" />
     <Compile Include="Crc32.cs" />
+    <Compile Include="Constants.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

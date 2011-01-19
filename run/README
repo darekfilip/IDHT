@@ -1,0 +1,6 @@
+./run.sh N
+N - ile wezlow - domyslnie 4
+
+Logowanie sie przez IceGridGui:
+IceGrid Instance Name:			IceGrid
+IceGrid Registry Endpoint(s):		tcp -h 127.0.0.1 -p 4061

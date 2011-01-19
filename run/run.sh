@@ -1,5 +1,12 @@
 #!/bin/bash
 
+killall icegridnode
+
+cd distrib
+rm IcePatch2.sum
+icepatch2calc .
+cd ..
+
 ILE=4
 if [ "$1" != "" ]
 then
@@ -21,4 +28,9 @@ do
 	fi
 done
 
-
+for I in `seq 1 $ILE`
+do
+	icegridnode --Ice.Config=conf/Node$I.cfg &
+	echo "Started Node$I"
+	sleep 1
+done

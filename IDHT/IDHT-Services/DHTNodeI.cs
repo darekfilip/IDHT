@@ -33,7 +33,7 @@ namespace IDHTServices
 		
 		private DHTNodePrx getNodeProxy(string id)
 		{
-			ObjectPrx prx = communicator.stringToProxy(Constants.SERVICE_NAME + '@' + id);
+			ObjectPrx prx = _communicator.stringToProxy(Constants.SERVICE_NAME + '@' + id);
 			return DHTNodePrxHelper.checkedCast(prx); 
 		}
 		
@@ -97,7 +97,7 @@ namespace IDHTServices
 		{
 			if (IsDisconnecting)
 			{
-				throw new Exception("Node shutting down.");
+				throw new System.Exception("Node shutting down.");
 			}
 
 			lock (ranges)
@@ -174,7 +174,7 @@ namespace IDHTServices
 			{
 				if (IsDisconnecting)
 				{
-					throw new Exception("Node shutting down");
+					throw new System.Exception("Node shutting down");
 				}
 				++servNum;
 			}
@@ -242,14 +242,14 @@ namespace IDHTServices
 								{
 									// jesli jest w dzieciach a nie osiagalna 
 									// to sie wyrejestrowuje
-									throw new Exception("Node not present!");
+									throw new System.Exception("Node not present!");
 								}
 								leave();
 								return prx.searchDHT(key);
 							}
 						}
 					}
-					catch (Exception)
+					catch (System.Exception)
 					{
 						error = true;
 						Thread.Sleep(100);
@@ -269,12 +269,12 @@ namespace IDHTServices
 						DHTNodePrx prx = getNodeProxy(_parent);
 						if (prx == null)
 						{
-							throw new Exception("Parent not present");
+							throw new System.Exception("Parent not present");
 						}
 						leave();
 						return prx.searchDHT(key);
 					}
-					catch (Exception)
+					catch (System.Exception)
 					{
 						error = true;
 						Thread.Sleep(100);
@@ -312,7 +312,7 @@ namespace IDHTServices
 								DHTNodePrx prx = getNodeProxy(n.nodeId);
 								if (prx == null)
 								{
-									throw new Exception("Node not present");
+									throw new System.Exception("Node not present");
 								}
 								prx.insertDHT(key, val);
 								inserted = true;
@@ -320,7 +320,7 @@ namespace IDHTServices
 							}
 						}
 					}
-					catch (Exception)
+					catch (System.Exception)
 					{
 						// wystapil blad - czekamy i ponawiamy
 						error = true;
@@ -355,7 +355,7 @@ namespace IDHTServices
 						DHTNodePrx parent = getNodeProxy(_parent);
 						parent.insertDHT(key, val);
 					}
-					catch (Exception)
+					catch (System.Exception)
 					{
 						error = true;
 						Thread.Sleep(100);
@@ -388,7 +388,7 @@ namespace IDHTServices
 					} 
 					else 
 					{
-						child.masterDisconnected(newRoot, null, new range[0], new nodeConf[0]);
+						child.masterDisconnected(newRoot, new range(), new range[0], new nodeConf[0]);
 					}
 				}
 			}
@@ -397,7 +397,7 @@ namespace IDHTServices
 				foreach (nodeConf ch in childs)
 				{
 					DHTNodePrx child = getNodeProxy(ch.nodeId);
-					child.masterDisconnected(_parent, null, new range[0], new nodeConf[0]);
+					child.masterDisconnected(_parent, new range(), new range[0], new nodeConf[0]);
 				}
 				DHTNodePrx prx = getNodeProxy(_parent);
 				prx.slaveDisconnected(_nodeName, ranges.ToArray(), childs.ToArray());
@@ -415,7 +415,7 @@ namespace IDHTServices
 			{
 				if (isMaster)
 				{
-					ObjectPrx prx = communicator.stringToProxy(Constants.SERVICE_NAME + '@' + id);
+					ObjectPrx prx = communicator.stringToProxy(Constants.SERVICE_NAME);
 					if (DHTNodePrxHelper.checkedCast(prx) == null)
 					{
 						subtreeRange = new range(int.MinValue, int.MaxValue);
@@ -425,18 +425,18 @@ namespace IDHTServices
 					}
 				}
 		
-				ObjectPrx prx = communicator.stringToProxy(Constants.SERVICE_NAME);
-				DHTNodePrx nprx =  DHTNodePrxHelper.checkedCast(prx);
+				ObjectPrx oprx = communicator.stringToProxy(Constants.SERVICE_NAME);
+				DHTNodePrx nprx =  DHTNodePrxHelper.checkedCast(oprx);
 				if (nprx != null)
 				{
 					try 
 					{
 						nodeConf my_node = nprx.newConnected(nodeName);
-						subtreeRange range = new range(my_node.min,my_node.max);
+						subtreeRange = new range(my_node.min, my_node.max);
 						_parent = my_node.parentNode;
 						configured = true;
 					}
-					catch (Exception)
+					catch (System.Exception)
 					{
 						configured = false;
 					}

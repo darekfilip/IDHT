@@ -27,6 +27,6 @@ Global
 		{3EAF9F7A-78A8-49CA-A154-59304791F344}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = IDHT-Common\IDHT-Common.csproj
+		StartupItem = IDHT-Client\IDHT-Client.csproj
 	EndGlobalSection
 EndGlobal

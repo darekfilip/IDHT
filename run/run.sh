@@ -3,6 +3,9 @@
 killall icegridnode
 
 cd distrib
+rm bin/*.dll
+rm bin/*.bz2
+cp ../../IDHT/IDHT-Services/bin/Debug/IDHT-*.dll bin/
 rm IcePatch2.sum
 icepatch2calc .
 cd ..

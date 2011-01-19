@@ -10,10 +10,11 @@
             <adapter name="${service}" endpoints="tcp" id="${server}.${service}" replica-group="IDHTNodeGroup"/>
          </service>
       </service-template>
-      <server-template id="IDHTNodeServerTemplate">
+      <server-template id="IDHTNodeIceBoxTemplate">
          <parameter name="INDEX"/>
-         <icebox id="IDHTNode${INDEX}" activation="manual" exe="erye">
-            <service-instance template="IDHTNodeServiceTemplate" NAME="IDHTNodeService"/>
+         <icebox id="IDHTNodeIceBox${INDEX}" activation="on-demand" exe="iceboxnet-3.3" pwd="${server.distrib}/bin">
+            <distrib icepatch="${application}.IcePatch2/server"/>
+            <service-instance template="IDHTNodeServiceTemplate" NAME="Service"/>
          </icebox>
       </server-template>
       <server-template id="IcePatch2">
@@ -35,17 +36,17 @@
          <object identity="IDHTNode" type="::IDHT::DHTNode"/>
       </replica-group>
       <node name="Node1">
-         <server-instance template="IDHTNodeServerTemplate" INDEX="1"/>
+         <server-instance template="IDHTNodeIceBoxTemplate" INDEX="1"/>
          <server-instance template="IcePatch2" directory="./distrib"/>
       </node>
       <node name="Node2">
-         <server-instance template="IDHTNodeServerTemplate" INDEX="2"/>
+         <server-instance template="IDHTNodeIceBoxTemplate" INDEX="2"/>
       </node>
       <node name="Node3">
-         <server-instance template="IDHTNodeServerTemplate" INDEX="3"/>
+         <server-instance template="IDHTNodeIceBoxTemplate" INDEX="3"/>
       </node>
       <node name="Node4">
-         <server-instance template="IDHTNodeServerTemplate" INDEX="4"/>
+         <server-instance template="IDHTNodeIceBoxTemplate" INDEX="4"/>
       </node>
    </application>
 </icegrid>

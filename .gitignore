@@ -1,3 +1,5 @@
 IDHT/*/bin
 IDHT/*.userprefs
 IDHT/*/*.pidb
+run/tmp/*
+run/conf/*

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-killall icegridnode
+killall -s 9 icegridnode
 
 rm -rf logs/
 mkdir logs/

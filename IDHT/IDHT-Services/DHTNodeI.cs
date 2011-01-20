@@ -406,46 +406,49 @@ namespace IDHTServices
 		
 		public DHTNodeI (string nodeName, bool isMaster, Communicator communicator)
 		{
-			bool configured = false;
+
 			IsDisconnecting = false;
 			_communicator = communicator;
 			_nodeName = nodeName;
-		
-			while (!configured)
+	
+			if (isMaster)
 			{
-				if (isMaster)
-				{
-					ObjectPrx prx = communicator.stringToProxy(Constants.SERVICE_NAME);
-					if (DHTNodePrxHelper.checkedCast(prx) == null)
-					{
-						subtreeRange = new range(int.MinValue, int.MaxValue);
-						_parent = null;
-						ranges.Add(subtreeRange);
-						break;
-					}
-				}
+				Console.WriteLine("No other node - became master.");
+				subtreeRange = new range(int.MinValue, int.MaxValue);
+				_parent = null;
+				ranges.Add(subtreeRange);
+				return;
+			}
 		
+			while (true)
+			{
+				Console.WriteLine("Connecting...");
 				ObjectPrx oprx = communicator.stringToProxy(Constants.SERVICE_NAME);
 				DHTNodePrx nprx =  DHTNodePrxHelper.checkedCast(oprx);
 				if (nprx != null)
 				{
 					try 
 					{
+						Console.WriteLine("Getting conf from parent...");
 						nodeConf my_node = nprx.newConnected(nodeName);
 						subtreeRange = new range(my_node.min, my_node.max);
 						_parent = my_node.parentNode;
-						configured = true;
+						Console.WriteLine("Node {0} parent: {1}",nodeName, _parent);
+						Console.WriteLine("DHTNodeI created");
+						return;
 					}
-					catch (System.Exception)
+					catch (System.Exception e)
 					{
-						configured = false;
+						Console.Error.WriteLine(e.StackTrace);
 					}
 				}
 				else
 				{
+					Console.WriteLine("Wait for master");
 					Thread.Sleep(500);	
 				}
 			}
+			
 		}
 	}
 }

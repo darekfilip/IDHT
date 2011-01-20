@@ -7,15 +7,15 @@ using IDHTCommon;
 
 namespace IDHTServices
 {
-	public class Server : Service
+	public class Server : IceBox.Service
 	{
 		private ObjectAdapter _adapter;
 
 		private DHTNodeI _node;
 		
-		public void start(string name, Communicator communicator, string[] args)
+		public void start(string name, Ice.Communicator communicator,  string[] args)
 		{
-			Console.WriteLine("STARTING Service: {0}",name);
+			Console.WriteLine("STARTING Service: {0}", name);
 			string prop =  communicator.getProperties().getProperty("IDHT.Master");
 			bool isMasterNode = (prop == null)? false: prop.Equals("1");
 			if (isMasterNode)
@@ -27,7 +27,7 @@ namespace IDHTServices
 			_adapter.add(_node, Ice.Util.stringToIdentity(Constants.SERVICE_NAME));
 			_adapter.activate();
 		}
-		
+
 		public void stop()
 		{
 			_adapter.deactivate();

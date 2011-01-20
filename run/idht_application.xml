@@ -12,7 +12,7 @@
       </service-template>
       <server-template id="IDHTNodeIceBoxTemplate">
          <parameter name="INDEX"/>
-         <icebox id="IDHTNodeIceBox${INDEX}" activation="on-demand" exe="iceboxnet-3.3" pwd="${server.distrib}/bin">
+         <icebox id="IDHTNodeIceBox${INDEX}" activation="manual" exe="iceboxnet-3.3" pwd="${server.distrib}/bin">
             <distrib icepatch="${application}.IcePatch2/server"/>
             <service-instance template="IDHTNodeServiceTemplate" NAME="${server}-Service"/>
          </icebox>

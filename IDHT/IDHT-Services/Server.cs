@@ -15,7 +15,13 @@ namespace IDHTServices
 		
 		public void start(string name, Communicator communicator, string[] args)
 		{
-			bool isMasterNode = communicator.getProperties().getPropertyAsIntWithDefault("IDHT.Master",0) == 1;
+			Console.WriteLine("STARTING Service: {0}",name);
+			string prop =  communicator.getProperties().getProperty("IDHT.Master");
+			bool isMasterNode = (prop == null)? false: prop.Equals("1");
+			if (isMasterNode)
+			{
+				Console.WriteLine("Is master node");
+			}
 			_node = new DHTNodeI(name, isMasterNode, communicator);
 			_adapter = communicator.createObjectAdapter(name);
 			_adapter.add(_node, Ice.Util.stringToIdentity(Constants.SERVICE_NAME));

@@ -14,7 +14,7 @@
          <parameter name="INDEX"/>
          <icebox id="IDHTNodeIceBox${INDEX}" activation="on-demand" exe="iceboxnet-3.3" pwd="${server.distrib}/bin">
             <distrib icepatch="${application}.IcePatch2/server"/>
-            <service-instance template="IDHTNodeServiceTemplate" NAME="Service"/>
+            <service-instance template="IDHTNodeServiceTemplate" NAME="${server}"/>
          </icebox>
       </server-template>
       <server-template id="IcePatch2">

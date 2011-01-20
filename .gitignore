@@ -6,3 +6,4 @@ run/conf/*
 run/distrib/IcePatch2.sum
 run/distrib/bin/*.dll
 run/distrib/bin/*.bz2
+run/logs/*

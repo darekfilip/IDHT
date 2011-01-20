@@ -2,6 +2,8 @@
 
 killall icegridnode
 
+rm -rf logs/
+mkdir logs/
 cd distrib
 rm bin/*.dll
 rm bin/*.bz2

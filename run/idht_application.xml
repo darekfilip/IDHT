@@ -21,7 +21,7 @@
          <parameter name="instance-name" default="${application}.IcePatch2"/>
          <parameter name="endpoints" default="default"/>
          <parameter name="directory"/>
-         <server id="${instance-name}" activation="on-demand" application-distrib="false" exe="icepatch2server">
+         <server id="${instance-name}" activation="always" application-distrib="false" exe="icepatch2server">
             <properties>
                <property name="IcePatch2.InstanceName" value="${instance-name}"/>
                <property name="IcePatch2.Directory" value="${directory}"/>
@@ -43,6 +43,9 @@
          </server-instance>
          <server-instance template="IcePatch2" directory="./distrib"/>
       </node>
+      <node name="Node10">
+         <server-instance template="IDHTNodeIceBoxTemplate" INDEX="10"/>
+      </node>
       <node name="Node2">
          <server-instance template="IDHTNodeIceBoxTemplate" INDEX="2"/>
       </node>
@@ -51,6 +54,21 @@
       </node>
       <node name="Node4">
          <server-instance template="IDHTNodeIceBoxTemplate" INDEX="4"/>
+      </node>
+      <node name="Node5">
+         <server-instance template="IDHTNodeIceBoxTemplate" INDEX="5"/>
+      </node>
+      <node name="Node6">
+         <server-instance template="IDHTNodeIceBoxTemplate" INDEX="6"/>
+      </node>
+      <node name="Node7">
+         <server-instance template="IDHTNodeIceBoxTemplate" INDEX="7"/>
+      </node>
+      <node name="Node8">
+         <server-instance template="IDHTNodeIceBoxTemplate" INDEX="8"/>
+      </node>
+      <node name="Node9">
+         <server-instance template="IDHTNodeIceBoxTemplate" INDEX="9"/>
       </node>
    </application>
 </icegrid>

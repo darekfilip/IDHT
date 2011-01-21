@@ -12,7 +12,7 @@ rm IcePatch2.sum
 icepatch2calc .
 cd ..
 
-ILE=4
+ILE=10
 if [ "$1" != "" ]
 then
 	ILE=$1
@@ -37,5 +37,8 @@ for I in `seq 1 $ILE`
 do
 	icegridnode --Ice.Config=conf/Node$I.cfg &
 	echo "Started Node$I"
-	sleep 1
+	if [ $I == 1 ]
+	then
+		sleep 1
+	fi
 done

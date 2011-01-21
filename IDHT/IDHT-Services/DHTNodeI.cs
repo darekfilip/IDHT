@@ -51,15 +51,15 @@ namespace IDHTServices
 					changed = false;
 					for (int j = i + 1; j < ranges.Count; ) 
 					{
-						if (ranges[j].min == r.max)
+						if ( r.max + 1 == ranges[j].min && r.max != int.MaxValue)
 						{
 							r.max = ranges[j].max;
 							ranges.RemoveAt(j);
 							changed = true;
 						} 
-						else if (ranges[j].max == r.min)
+						else if (ranges[j].max + 1 == r.min && ranges[j].max != int.MaxValue)
 						{
-							r.max = ranges[j].max;
+							r.min = ranges[j].min;
 							ranges.RemoveAt(j);
 							changed = true;
 						}
@@ -71,13 +71,15 @@ namespace IDHTServices
 				}
 				newRanges.Add(r);
 			}
-			ranges = newRanges;
+			ranges.Clear();
+			ranges.AddRange(newRanges);
 		}
 		
 		public override void masterDisconnected (string connectTo, range subtree, range[] newRanges, nodeConf[] childRanges, Ice.Current current__)
 		{
 			lock (ranges)
 			{
+				Console.WriteLine("Master disconnected");
 				_parent = connectTo;
 				if (connectTo == null) // jestem nowy rootem dla tego poddrzewa
 				{
@@ -90,20 +92,22 @@ namespace IDHTServices
 				}
 				childs.AddRange(childRanges);
 				reduceRanges();
+				Console.WriteLine(describe());
 			}
 		}
 		
 		public override nodeConf newConnected (string id, Ice.Current current__)
 		{
+			Console.WriteLine("Slave connected: {0}", id);
 			if (IsDisconnecting)
 			{
 				throw new System.Exception("Node shutting down.");
 			}
-
 			lock (ranges)
 			{
 				nodeConf nc = new nodeConf();
 				nc.parentNode = _nodeName;
+				nc.nodeId = id;
 				if (ranges.Count > 1)
 				{
 					nc.min = ranges[0].min;
@@ -132,6 +136,8 @@ namespace IDHTServices
 					}
 					nc.elems = elems.ToArray();
 				}
+				childs.Add(nc);
+				Console.WriteLine(describe());
 				return nc;
 			}
 		}
@@ -141,6 +147,7 @@ namespace IDHTServices
 		{
 			lock (ranges)
 			{
+				Console.WriteLine("Slave disconected "+id);
 				nodeConf removedNode = null;
 				foreach (nodeConf nc in childs)
 				{
@@ -151,6 +158,7 @@ namespace IDHTServices
 				}
 				if (removedNode != null)
 				{
+					childs.Remove(removedNode);
 					foreach (range r in newRanges)
 					{
 						ranges.Add(r);
@@ -165,6 +173,7 @@ namespace IDHTServices
 				{
 					Console.WriteLine("Struct fail: {0} is not a child of {1}", id, _nodeName); 
 				}
+				Console.WriteLine(describe());
 			}
 		}		
 		
@@ -367,6 +376,7 @@ namespace IDHTServices
 		
 		public void shutDown()
 		{
+			Console.WriteLine("Node shutting down");
 			IsDisconnecting = true;
 			lock (_discLock)
 			{
@@ -402,6 +412,22 @@ namespace IDHTServices
 				DHTNodePrx prx = getNodeProxy(_parent);
 				prx.slaveDisconnected(_nodeName, ranges.ToArray(), childs.ToArray());
 			}
+			Console.WriteLine("Node down");
+		}
+		
+		private string describe()
+		{
+			string s = "\n\nparent: " + _parent;
+			s += "\nsubtree: <"+subtreeRange.min+" : "+subtreeRange.max+">";
+			foreach (range r in ranges)
+			{
+				s += "\nrange: <" + r.min + " : " + r.max + ">";
+			}
+			foreach (nodeConf c in childs)
+			{
+				s += "\nchild " + c.nodeId + ": <" + c.min + " : " + c.max  +">";
+			}
+			return s;
 		}
 		
 		public DHTNodeI (string nodeName, bool isMaster, Communicator communicator)
@@ -413,33 +439,31 @@ namespace IDHTServices
 	
 			if (isMaster)
 			{
-				Console.WriteLine("No other node - became master.");
 				subtreeRange = new range(int.MinValue, int.MaxValue);
 				_parent = null;
-				ranges.Add(subtreeRange);
+				ranges.Add(new range(int.MinValue, int.MaxValue));
+				Console.WriteLine(describe());
 				return;
 			}
 		
 			while (true)
 			{
-				Console.WriteLine("Connecting...");
 				ObjectPrx oprx = communicator.stringToProxy(Constants.SERVICE_NAME);
 				DHTNodePrx nprx =  DHTNodePrxHelper.checkedCast(oprx);
 				if (nprx != null)
 				{
 					try 
 					{
-						Console.WriteLine("Getting conf from parent...");
 						nodeConf my_node = nprx.newConnected(nodeName);
 						subtreeRange = new range(my_node.min, my_node.max);
+						ranges.Add(new range(my_node.min, my_node.max));
 						_parent = my_node.parentNode;
-						Console.WriteLine("Node {0} parent: {1}",nodeName, _parent);
-						Console.WriteLine("DHTNodeI created");
+						Console.WriteLine(describe());
 						return;
 					}
-					catch (System.Exception e)
+					catch (Ice.Exception e)
 					{
-						Console.Error.WriteLine(e.StackTrace);
+						Console.WriteLine(e.StackTrace);
 					}
 				}
 				else

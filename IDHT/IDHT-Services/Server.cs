@@ -22,16 +22,16 @@ namespace IDHTServices
 			{
 				Console.WriteLine("Is master node");
 			}
-			_node = new DHTNodeI(name, isMasterNode, communicator);
-			_adapter = communicator.createObjectAdapter(name);
+			_node = new DHTNodeI(communicator.getProperties().getProperty(name+".AdapterId"), isMasterNode, communicator);
+			_adapter = communicator.createObjectAdapter(name);	
 			_adapter.add(_node, Ice.Util.stringToIdentity(Constants.SERVICE_NAME));
 			_adapter.activate();
 		}
 
 		public void stop()
 		{
-			_adapter.deactivate();
 			_node.shutDown();
+			_adapter.deactivate();
 		}
 
 	}

@@ -81,8 +81,10 @@ namespace IDHTServices
 			{
 				Console.WriteLine("Master disconnected");
 				_parent = connectTo;
-				if (connectTo == null) // jestem nowy rootem dla tego poddrzewa
+				if (_parent == null || _parent.Equals("")) // jestem nowy rootem dla tego poddrzewa
 				{
+					Console.WriteLine("setting subtree range: "+subtree.min + " : " + subtree.max);
+					_parent = null;
 					subtreeRange = subtree;
 				}
 				ranges.AddRange(newRanges);
@@ -393,7 +395,7 @@ namespace IDHTServices
 					DHTNodePrx child = getNodeProxy(ch.nodeId);
 					if (newRoot == null)
 					{
-						child.masterDisconnected(newRoot, subtreeRange, ranges.ToArray(), childs.ToArray()); 
+						child.masterDisconnected(null, subtreeRange, ranges.ToArray(), childs.GetRange(1, ranges.Count-1).ToArray()); 
 						newRoot = ch.nodeId;
 					} 
 					else 

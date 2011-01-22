@@ -109,7 +109,7 @@ namespace IDHT
 
         public string key;
 
-        public string value;
+        public string val;
 
         #endregion
 
@@ -119,10 +119,10 @@ namespace IDHT
         {
         }
 
-        public keyvaluepair(string key, string value)
+        public keyvaluepair(string key, string val)
         {
             this.key = key;
-            this.value = value;
+            this.val = val;
         }
 
         #endregion
@@ -145,9 +145,9 @@ namespace IDHT
             {
                 h__ = 5 * h__ + key.GetHashCode();
             }
-            if(value != null)
+            if(val != null)
             {
-                h__ = 5 * h__ + value.GetHashCode();
+                h__ = 5 * h__ + val.GetHashCode();
             }
             return h__;
         }
@@ -181,16 +181,16 @@ namespace IDHT
                     return false;
                 }
             }
-            if(value == null)
+            if(val == null)
             {
-                if(o__.value != null)
+                if(o__.val != null)
                 {
                     return false;
                 }
             }
             else
             {
-                if(!value.Equals(o__.value))
+                if(!val.Equals(o__.val))
                 {
                     return false;
                 }
@@ -219,13 +219,13 @@ namespace IDHT
         public void write__(IceInternal.BasicStream os__)
         {
             os__.writeString(key);
-            os__.writeString(value);
+            os__.writeString(val);
         }
 
         public void read__(IceInternal.BasicStream is__)
         {
             key = is__.readString();
-            value = is__.readString();
+            val = is__.readString();
         }
 
         #endregion

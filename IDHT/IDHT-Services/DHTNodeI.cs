@@ -119,7 +119,10 @@ namespace IDHTServices
 				else 
 				{
 					nc.min = ranges[0].min;
-					nc.max = (ranges[0].min + ranges[0].max)/2;
+					long v = ranges[0].max;
+					v += ranges[0].min;
+					v /= 2;
+					nc.max = (int)v;
 					range r = ranges[0];
 					r.min = nc.max + 1;
 					ranges[0] = r;
@@ -206,8 +209,8 @@ namespace IDHTServices
 		public override string searchDHT (string key, Ice.Current current__)
 		{
 			enter();
-			
 			int crc = CRC.getCRC(key);
+			Console.WriteLine("SEARCH CRC(" + key + ") = " + crc);
 			if (crc <= subtreeRange.max && crc >= subtreeRange.min)
 			{
 				// szukamy w swoich
@@ -223,10 +226,10 @@ namespace IDHTServices
 								List<keyvaluepair> vals = values[crc];
 								foreach (keyvaluepair kvp in vals)
 								{
-									if (kvp.key == key)
+									if (kvp.key.Equals(key))
 									{
 										leave();
-										return kvp.value;
+										return kvp.val;
 									}
 								}
 							}
@@ -301,6 +304,7 @@ namespace IDHTServices
 		{
 			enter();
 			int crc = CRC.getCRC(key);
+			Console.WriteLine("INSERT CRC(" + key + ") = " + crc);
 			if (crc <= subtreeRange.max && crc >= subtreeRange.min) 
 			{
 				// wyszukujemy wśród dzieci
@@ -343,6 +347,7 @@ namespace IDHTServices
 				{
 					lock (values)
 					{
+						Console.WriteLine("INSERT " + key + " -> " + val);
 						if (values.ContainsKey(crc))
 						{
 							values[crc].Add(new keyvaluepair(key, val));

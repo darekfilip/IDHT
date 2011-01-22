@@ -6,7 +6,7 @@ module IDHT {
 	
 	struct keyvaluepair {
 		string key;
-		string value;
+		string val;
 	};
 
 	sequence<keyvaluepair> values;

@@ -8,3 +8,4 @@ run/distrib/bin/*.dll
 run/distrib/bin/*.bz2
 run/logs/*
 run/*.exe
+run/*.dll

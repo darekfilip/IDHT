@@ -4,10 +4,10 @@ namespace IDHTClient
 {
 	class MainClass
 	{
-		public static void Main (string[] args)
+		public static void Main(string[] args)
 		{
 			Client c = new Client();
-			c.run(args);
+			Environment.Exit(c.main(args));
 		}
 	}
 }

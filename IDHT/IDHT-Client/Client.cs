@@ -19,13 +19,11 @@ namespace IDHTClient
 			}
 			if (args.Length >= 3 && args[0].Equals("-p"))
 			{
-				Console.WriteLine("PUT("+args[1] + " -> "+args[2]+")");
 				dhtnode.insertDHT(args[1], args[2]);
-				Console.WriteLine("GET("+args[1]+") -> "+dhtnode.searchDHT(args[1]));
 			}
 			else if (args.Length >= 2 && args[0].Equals("-g"))
 			{
-				Console.WriteLine("GET("+args[1]+") -> "+dhtnode.searchDHT(args[1]));
+				Console.WriteLine(dhtnode.searchDHT(args[1]));
 			}
 			else
 			{

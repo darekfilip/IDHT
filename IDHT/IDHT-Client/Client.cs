@@ -9,20 +9,25 @@ namespace IDHTClient
 {
 	public class Client : Application
 	{
+		
 		public override int run(string[] args)
 		{
-			// TODO: jakas petelke for
-			// wsadzic losowych 1000 elementow i je wyciagac 
-			// wsadzac w sposob val = f(key)
-			// zrobic veryfikacje
 			ObjectPrx prx = communicator().stringToProxy(Constants.SERVICE_NAME);
 			DHTNodePrx dhtnode = DHTNodePrxHelper.checkedCast(prx);
 			if (dhtnode == null)
 			{
 				throw new ApplicationException("Wrong proxy");
 			}
-			dhtnode.insertDHT("darek", "value for darek");
-			Console.WriteLine(dhtnode.searchDHT("darek"));
+			if (args.Length >= 4 && args[1].Equals("-p"))
+			{
+				Console.WriteLine("PUT("+args[2] + " -> "+args[3]+") ...");
+				dhtnode.insertDHT(args[2], args[3]);
+				Console.WriteLine("GET("+args[2]+") -> "+dhtnode.searchDHT(args[2]));
+			}
+			else if (args.Length >= 3 && args[1].Equals("-g"))
+			{
+				Console.WriteLine("GET("+args[2]+") -> "+dhtnode.searchDHT(args[2]));
+			}
 			return 0;
 		}
 	}

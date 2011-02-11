@@ -443,6 +443,9 @@ namespace IDHT
         void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges);
         void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__);
 
+        bool removeDHT(string key);
+        bool removeDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__);
+
         string searchDHT(string key);
         string searchDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__);
 
@@ -461,6 +464,8 @@ namespace IDHT
 
         void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, Ice.Current current__);
 
+        bool removeDHT(string key, Ice.Current current__);
+
         string searchDHT(string key, Ice.Current current__);
 
         void insertDHT(string key, string val, Ice.Current current__);
@@ -473,6 +478,8 @@ namespace IDHT
         void slaveDisconnected(string id, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges);
 
         void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges);
+
+        bool removeDHT(string key);
 
         string searchDHT(string key);
 
@@ -698,6 +705,44 @@ namespace IDHT
                     delBase__ = getDelegate__(false);
                     DHTNodeDel_ del__ = (DHTNodeDel_)delBase__;
                     return del__.newConnected(id, context__);
+                }
+                catch(IceInternal.LocalExceptionWrapper ex__)
+                {
+                    handleExceptionWrapper__(delBase__, ex__, null);
+                }
+                catch(Ice.LocalException ex__)
+                {
+                    handleException__(delBase__, ex__, null, ref cnt__);
+                }
+            }
+        }
+
+        public bool removeDHT(string key)
+        {
+            return removeDHT(key, null, false);
+        }
+
+        public bool removeDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__)
+        {
+            return removeDHT(key, context__, true);
+        }
+
+        private bool removeDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__, bool explicitContext__)
+        {
+            if(explicitContext__ && context__ == null)
+            {
+                context__ = emptyContext_;
+            }
+            int cnt__ = 0;
+            while(true)
+            {
+                Ice.ObjectDel_ delBase__ = null;
+                try
+                {
+                    checkTwowayOnly__("removeDHT");
+                    delBase__ = getDelegate__(false);
+                    DHTNodeDel_ del__ = (DHTNodeDel_)delBase__;
+                    return del__.removeDHT(key, context__);
                 }
                 catch(IceInternal.LocalExceptionWrapper ex__)
                 {
@@ -939,6 +984,8 @@ namespace IDHT
 
         void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, _System.Collections.Generic.Dictionary<string, string> context__);
 
+        bool removeDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__);
+
         string searchDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__);
 
         void insertDHT(string key, string val, _System.Collections.Generic.Dictionary<string, string> context__);
@@ -1100,6 +1147,52 @@ namespace IDHT
                         ret__ = new IDHT.nodeConf();
                     }
                     ret__.read__(is__);
+                    is__.endReadEncaps();
+                    return ret__;
+                }
+                catch(Ice.LocalException ex__)
+                {
+                    throw new IceInternal.LocalExceptionWrapper(ex__, false);
+                }
+            }
+            finally
+            {
+                handler__.reclaimOutgoing(og__);
+            }
+        }
+
+        public bool removeDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__)
+        {
+            IceInternal.Outgoing og__ = handler__.getOutgoing("removeDHT", Ice.OperationMode.Normal, context__);
+            try
+            {
+                try
+                {
+                    IceInternal.BasicStream os__ = og__.ostr();
+                    os__.writeString(key);
+                }
+                catch(Ice.LocalException ex__)
+                {
+                    og__.abort(ex__);
+                }
+                bool ok__ = og__.invoke();
+                try
+                {
+                    if(!ok__)
+                    {
+                        try
+                        {
+                            og__.throwUserException();
+                        }
+                        catch(Ice.UserException ex__)
+                        {
+                            throw new Ice.UnknownUserException(ex__.ice_name(), ex__);
+                        }
+                    }
+                    IceInternal.BasicStream is__ = og__.istr();
+                    is__.startReadEncaps();
+                    bool ret__;
+                    ret__ = is__.readBool();
                     is__.endReadEncaps();
                     return ret__;
                 }
@@ -1362,6 +1455,50 @@ namespace IDHT
             return result__;
         }
 
+        public bool removeDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__)
+        {
+            Ice.Current current__ = new Ice.Current();
+            initCurrent__(ref current__, "removeDHT", Ice.OperationMode.Normal, context__);
+            bool result__ = false;
+            IceInternal.Direct.RunDelegate run__ = delegate(Ice.Object obj__)
+            {
+                DHTNode servant__ = null;
+                try
+                {
+                    servant__ = (DHTNode)obj__;
+                }
+                catch(_System.InvalidCastException)
+                {
+                    throw new Ice.OperationNotExistException(current__.id, current__.facet, current__.operation);
+                }
+                result__ = servant__.removeDHT(key, current__);
+                return Ice.DispatchStatus.DispatchOK;
+            };
+            IceInternal.Direct direct__ = null;
+            try
+            {
+                direct__ = new IceInternal.Direct(current__, run__);
+                try
+                {
+                    Ice.DispatchStatus status__ = direct__.servant().collocDispatch__(direct__);
+                    _System.Diagnostics.Debug.Assert(status__ == Ice.DispatchStatus.DispatchOK);
+                }
+                finally
+                {
+                    direct__.destroy();
+                }
+            }
+            catch(Ice.SystemException)
+            {
+                throw;
+            }
+            catch(System.Exception ex__)
+            {
+                IceInternal.LocalExceptionWrapper.throwWrapper(ex__);
+            }
+            return result__;
+        }
+
         public string searchDHT(string key, _System.Collections.Generic.Dictionary<string, string> context__)
         {
             Ice.Current current__ = new Ice.Current();
@@ -1476,6 +1613,13 @@ namespace IDHT
         }
 
         public abstract void masterDisconnected(string connectTo, IDHT.range subtree, IDHT.range[] newRanges, IDHT.nodeConf[] childRanges, Ice.Current current__);
+
+        public bool removeDHT(string key)
+        {
+            return removeDHT(key, Ice.ObjectImpl.defaultCurrent);
+        }
+
+        public abstract bool removeDHT(string key, Ice.Current current__);
 
         public string searchDHT(string key)
         {
@@ -1637,6 +1781,20 @@ namespace IDHT
             return Ice.DispatchStatus.DispatchOK;
         }
 
+        public static Ice.DispatchStatus removeDHT___(DHTNode obj__, IceInternal.Incoming inS__, Ice.Current current__)
+        {
+            checkMode__(Ice.OperationMode.Normal, current__.mode);
+            IceInternal.BasicStream is__ = inS__.istr();
+            is__.startReadEncaps();
+            string key;
+            key = is__.readString();
+            is__.endReadEncaps();
+            IceInternal.BasicStream os__ = inS__.ostr();
+            bool ret__ = obj__.removeDHT(key, current__);
+            os__.writeBool(ret__);
+            return Ice.DispatchStatus.DispatchOK;
+        }
+
         public static Ice.DispatchStatus searchDHT___(DHTNode obj__, IceInternal.Incoming inS__, Ice.Current current__)
         {
             checkMode__(Ice.OperationMode.Normal, current__.mode);
@@ -1674,6 +1832,7 @@ namespace IDHT
             "insertDHT",
             "masterDisconnected",
             "newConnected",
+            "removeDHT",
             "searchDHT",
             "slaveDisconnected"
         };
@@ -1718,9 +1877,13 @@ namespace IDHT
                 }
                 case 7:
                 {
-                    return searchDHT___(this, inS__, current__);
+                    return removeDHT___(this, inS__, current__);
                 }
                 case 8:
+                {
+                    return searchDHT___(this, inS__, current__);
+                }
+                case 9:
                 {
                     return slaveDisconnected___(this, inS__, current__);
                 }

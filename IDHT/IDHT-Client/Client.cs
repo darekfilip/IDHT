@@ -25,9 +25,18 @@ namespace IDHTClient
 			{
 				Console.WriteLine(dhtnode.searchDHT(args[1]));
 			}
+			else if (args.Length >= 2 && args[0].Equals("-r"))
+			{
+				Console.WriteLine(dhtnode.removeDHT(args[1]));
+			}
 			else
 			{
 				Console.WriteLine("incorrect parameters");
+				Console.WriteLine("{0} --Ice.Config=client.cfg <option> <key> [<value>]", args[0]);
+				Console.WriteLine("parameters:");
+				Console.WriteLine(" -p	put value & key in DHT");
+				Console.WriteLine(" -g	find value for key");
+				Console.WriteLine(" -r	remove value for key");
 			}
 			return 0;
 		}

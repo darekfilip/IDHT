@@ -205,6 +205,102 @@ namespace IDHTServices
 				}
 			}
 		}
+
+		// tak tak, skopiowałem z searchDHT ;)
+		public override bool removeDHT(string key, Ice.Current current__)
+		{
+			enter();
+			int crc = CRC.getCRC(key);
+			Console.WriteLine("REMOVE CRC(" + key + ") = " + crc);
+			if (crc <= subtreeRange.max && crc >= subtreeRange.min)
+			{
+				// szukamy w swoich
+				List<range> myRanges = new List<range>(ranges);
+				foreach (range r in myRanges)
+				{
+					if (r.max >= crc && r.min <= crc)
+					{
+						lock (values)
+						{
+							if (values.ContainsKey(crc))
+							{
+								List<keyvaluepair> vals = values[crc];
+								foreach (keyvaluepair kvp in vals)
+								{
+									if (kvp.key.Equals(key))
+									{
+										values[crc].Remove(kvp);
+										leave();
+										return true;
+									}
+								}
+							}
+						}
+						leave();
+						return false;
+					}
+				}
+				
+				// szukamy u potomkow
+				bool error = true;
+				while (error)
+				{
+					error = false;
+					try
+					{
+						List<nodeConf> childNodes = new List<nodeConf>(childs);
+						foreach (nodeConf nc in childNodes)
+						{
+							if (nc.min <= crc && nc.max >= crc)
+							{
+								DHTNodePrx prx = getNodeProxy(nc.nodeId);
+								if (prx == null)
+								{
+									// jesli jest w dzieciach a nie osiagalna 
+									// to sie wyrejestrowuje
+									throw new System.Exception("Node not present!");
+								}
+								leave();
+								return prx.removeDHT(key);
+							}
+						}
+					}
+					catch (System.Exception)
+					{
+						error = true;
+						Thread.Sleep(100);
+					}
+				}
+				leave();
+				return false;
+			}
+			else
+			{
+				bool error = true;
+				while (error)
+				{
+					error = false;
+					try
+					{
+						DHTNodePrx prx = getNodeProxy(_parent);
+						if (prx == null)
+						{
+							throw new System.Exception("Parent not present");
+						}
+						leave();
+						return prx.removeDHT(key);
+					}
+					catch (System.Exception)
+					{
+						error = true;
+						Thread.Sleep(100);
+					}
+				}
+			}
+			leave();
+			return false;
+		}
+			
 		
 		public override string searchDHT (string key, Ice.Current current__)
 		{

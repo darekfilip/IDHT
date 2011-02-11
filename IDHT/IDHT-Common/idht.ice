@@ -39,6 +39,9 @@ module IDHT {
 		// i kaze im sie polaczyc do swojego mastera
 		void masterDisconnected(string connectTo, range subtree, ranges newRanges, confs childRanges);
 
+		// usuwa - u siebie badz przekazuje do swoich sasiadow
+		bool removeDHT(string key);
+
 		// przeszukuje - sprawdza u siebie i ewentualnie sasiadow
 		string searchDHT(string key);
 
